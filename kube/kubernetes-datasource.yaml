@@ -1,147 +1,147 @@
-# This file provides the logic to create the datasource for the assessment
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: cdm
----  
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: cdm-db
-  namespace: cdm
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: cdm-db
-  template:
-    metadata:
-      labels:
-        app: cdm-db
-    spec:
-      containers:
-      - name: cdm-db
-        image: "inganalytics/cdm-db-small:latest"
-        ports:
-        - containerPort: 5432
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: cdm-db
-  namespace: cdm
-spec:
-  selector:
-    app: cdm-db
-  ports:
-    - protocol: TCP
-      port: 5432
-      targetPort: 5432
-  type: ClusterIP
----  
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: cdm-api
-  namespace: cdm
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: cdm-api
-  template:
-    metadata:
-      labels:
-        app: cdm-api
-    spec:
-      restartPolicy: Always
-      containers:
-      - name: cdm-api
-        image: "inganalytics/cdm-api:latest"
-        env:
-        - name: SIZE_SETTING
-          value: small
-        ports:
-        - containerPort: 8080
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: cdm-api
-  namespace: cdm
-spec:
-  selector:
-    app: cdm-api
-  ports:
-    - protocol: TCP
-      port: 81
-      targetPort: 8080
-  type: ClusterIP
----  
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: swagger-ui
-  namespace: cdm
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: swagger-ui
-  template:
-    metadata:
-      labels:
-        app: swagger-ui
-    spec:
-      containers:
-      - name: swagger-ui
-        image: "swaggerapi/swagger-ui"
-        env:
-        - name: SWAGGER_JSON_URL
-          value: "http://cdm-api:81/apidocs.json"
-        - name: BASE_URL
-          value: "/cdm-swagger"
-        ports:
-        - containerPort: 8080
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: swagger-ui
-  namespace: cdm
-spec:
-  selector:
-    app: swagger-ui
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
-  type: ClusterIP 
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: cdm-ingress
-  namespace: cdm
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-spec:
-  ingressClassName: nginx
-  rules:
-  - http:
-      paths:
-      - pathType: Prefix
-        path: /cdm-swagger
-        backend:
-          service:
-            name: swagger-ui
-            port:
-              number: 80
-      - pathType: Prefix
-        path: /cdm-api(/|$)(.*)
-        backend:
-          service:
-            name: cdm-api
-            port:
-              number: 81
+# # This file provides the logic to create the datasource for the assessment
+# ---
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: cdm
+# ---  
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: cdm-db
+#   namespace: cdm
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: cdm-db
+#   template:
+#     metadata:
+#       labels:
+#         app: cdm-db
+#     spec:
+#       containers:
+#       - name: cdm-db
+#         image: "inganalytics/cdm-db-small:latest"
+#         ports:
+#         - containerPort: 5432
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: cdm-db
+#   namespace: cdm
+# spec:
+#   selector:
+#     app: cdm-db
+#   ports:
+#     - protocol: TCP
+#       port: 5432
+#       targetPort: 5432
+#   type: ClusterIP
+# ---  
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: cdm-api
+#   namespace: cdm
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: cdm-api
+#   template:
+#     metadata:
+#       labels:
+#         app: cdm-api
+#     spec:
+#       restartPolicy: Always
+#       containers:
+#       - name: cdm-api
+#         image: "inganalytics/cdm-api:latest"
+#         env:
+#         - name: SIZE_SETTING
+#           value: small
+#         ports:
+#         - containerPort: 8080
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: cdm-api
+#   namespace: cdm
+# spec:
+#   selector:
+#     app: cdm-api
+#   ports:
+#     - protocol: TCP
+#       port: 81
+#       targetPort: 8080
+#   type: ClusterIP
+# ---  
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: swagger-ui
+#   namespace: cdm
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: swagger-ui
+#   template:
+#     metadata:
+#       labels:
+#         app: swagger-ui
+#     spec:
+#       containers:
+#       - name: swagger-ui
+#         image: "swaggerapi/swagger-ui"
+#         env:
+#         - name: SWAGGER_JSON_URL
+#           value: "http://cdm-api:81/apidocs.json"
+#         - name: BASE_URL
+#           value: "/cdm-swagger"
+#         ports:
+#         - containerPort: 8080
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: swagger-ui
+#   namespace: cdm
+# spec:
+#   selector:
+#     app: swagger-ui
+#   ports:
+#     - protocol: TCP
+#       port: 80
+#       targetPort: 8080
+#   type: ClusterIP 
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: cdm-ingress
+#   namespace: cdm
+#   annotations:
+#     nginx.ingress.kubernetes.io/rewrite-target: /$2
+# spec:
+#   ingressClassName: nginx
+#   rules:
+#   - http:
+#       paths:
+#       - pathType: Prefix
+#         path: /cdm-swagger
+#         backend:
+#           service:
+#             name: swagger-ui
+#             port:
+#               number: 80
+#       - pathType: Prefix
+#         path: /cdm-api(/|$)(.*)
+#         backend:
+#           service:
+#             name: cdm-api
+#             port:
+#               number: 81
