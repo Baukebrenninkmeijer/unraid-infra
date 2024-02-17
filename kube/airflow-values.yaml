@@ -30,7 +30,7 @@ airflow:
   config:
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
     AIRFLOW__CORE__LOAD_EXAMPLES: "False"
-    AIRFLOW__WEBSERVER__BASE_URL: "http://192.168.178.100/airflow"
+    AIRFLOW__WEBSERVER__BASE_URL: "http:/streamy.nl/airflow"
     AIRFLOW__CELERY__FLOWER_URL_PREFIX: "/airflow/flower"
 
   ## a list of users to create
@@ -275,7 +275,7 @@ ingress:
   ## airflow webserver ingress configs
   web:
     annotations: {}
-    host: "192.168.178.100"
+    host: "streamy.nl"
     path: "/airflow"
     ## WARNING: requires Kubernetes 1.18 or later, use "kubernetes.io/ingress.class" annotation for older versions
     ingressClassName: "nginx"
@@ -283,7 +283,7 @@ ingress:
   ## flower ingress configs
   flower:
     annotations: {}
-    host: "192.168.178.100"
+    host: "streamy.nl"
     path: "/airflow/flower"
     ## WARNING: requires Kubernetes 1.18 or later, use "kubernetes.io/ingress.class" annotation for older versions
     ingressClassName: "nginx"
