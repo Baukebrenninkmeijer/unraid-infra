@@ -30,7 +30,7 @@ airflow:
   config:
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
     AIRFLOW__CORE__LOAD_EXAMPLES: "False"
-    AIRFLOW__WEBSERVER__BASE_URL: "http://127.0.0.1/airflow"
+    AIRFLOW__WEBSERVER__BASE_URL: "http://192.168.178.100/airflow"
     AIRFLOW__CELERY__FLOWER_URL_PREFIX: "/airflow/flower"
 
   ## a list of users to create
