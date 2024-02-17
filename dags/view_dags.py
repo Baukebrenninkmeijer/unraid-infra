@@ -10,7 +10,7 @@ default_args = {
 }
 
 
-@dag(schedule="@once", default_args=default_args, tags=["SQL"])
+@dag(schedule=None, default_args=default_args, tags=["SQL"])
 def create_views():
     create_view_transaction_enriched = PostgresOperator(
         task_id="create_view_transaction_enriched",
@@ -47,8 +47,8 @@ def create_views():
             """,
     )
 
-    create_view_transaction_enriched = PostgresOperator(
-        task_id="create_view_transaction_enriched",
+    create_view_interacted_countries_enriched = PostgresOperator(
+        task_id="create_view_interacted_enriched",
         postgres_conn_id=POSTGRES_CON_ID,
         sql="""
             CREATE OR REPLACE VIEW "interacted_countries" as
@@ -64,10 +64,10 @@ def create_views():
         """,
     )
 
-    [create_view_transaction_enriched, create_view_balances]
+    [create_view_transaction_enriched, create_view_balances, create_view_interacted_countries_enriched]
 
 
-@dag(schedule="@once", default_args=default_args, tags=["SQL"])
+@dag(schedule=None, default_args=default_args, tags=["SQL"])
 def drop_views():
     drop_view_transaction_enriched = PostgresOperator(
         task_id="drop_view_transaction_enriched",
@@ -88,3 +88,7 @@ def drop_views():
     )
 
     [drop_view_transaction_enriched, drop_view_balances, drop_view_interacted_countries]
+
+
+create_views()
+drop_views()
