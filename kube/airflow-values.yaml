@@ -275,7 +275,7 @@ ingress:
   ## airflow webserver ingress configs
   web:
     annotations: {}
-    host: "localhost"
+    host: "192.168.178.100"
     path: "/airflow"
     ## WARNING: requires Kubernetes 1.18 or later, use "kubernetes.io/ingress.class" annotation for older versions
     ingressClassName: "nginx"
@@ -283,7 +283,7 @@ ingress:
   ## flower ingress configs
   flower:
     annotations: {}
-    host: "localhost"
+    host: "192.168.178.100"
     path: "/airflow/flower"
     ## WARNING: requires Kubernetes 1.18 or later, use "kubernetes.io/ingress.class" annotation for older versions
     ingressClassName: "nginx"
