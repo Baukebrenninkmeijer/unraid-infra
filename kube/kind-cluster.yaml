@@ -1,0 +1,72 @@
+---
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: airflow-assessment-cluster
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.29.1
+    # Required for Kubernetes to create 'local' volumes located on your machine
+    # TODO: change the hostPath to directories on your own machine.
+    # The hostPath for dags on L15, L49 and L64 should all point to the same location
+    # The hostPath for logs on L17, L51 and 66 should all point to the same location
+    # The hostPath for output on L19, L53 and L68 should all point to the same location
+    # https://kind.sigs.k8s.io/docs/user/configuration/#extra-mounts
+    extraMounts:
+      - hostPath: &dags_host ./dags
+        containerPath: &dags_cont /dags
+      - hostPath: &logs_host ./logs
+        containerPath: &logs_cont /logs
+      - hostPath: &output_host ./output
+        containerPath: &output_cont /output
+    # Required settings to make a cluster with ingress
+    # For the assessment it is not required to change this setting
+    # https://kind.sigs.k8s.io/docs/user/ingress/#create-cluster
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    # Required settings to make a cluster with ingress
+    # For the assessment it is not required to change this setting
+    # https://kind.sigs.k8s.io/docs/user/ingress/#create-cluster
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 1881
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 18444
+        protocol: TCP
+      - containerPort: 8080
+        hostPort: 8080
+        protocol: TCP
+  - role: worker
+    image: kindest/node:v1.29.1
+    # Required for Kubernetes to create 'local' volumes located on your machine
+    # TODO: change the hostPath to directories on your own machine
+    # The hostPath for dags on L15, L49 and L64 should all point to the same location
+    # The hostPath for logs on L17, L51 and 66 should all point to the same location
+    # The hostPath for output on L19, L53 and L68 should all point to the same location
+    # https://kind.sigs.k8s.io/docs/user/configuration/#extra-mounts
+    extraMounts:
+      - hostPath: *dags_host
+        containerPath: *dags_cont
+      - hostPath: *logs_host
+        containerPath: *logs_cont
+      - hostPath: *output_host
+        containerPath: *output_cont
+  - role: worker
+    # Required for Kubernetes to create 'local' volumes located on your machine
+    # TODO: change the hostPath to directories on your own machine
+    # The hostPath for dags on L15, L49 and L64 should all point to the same location
+    # The hostPath for logs on L17, L51 and 66 should all point to the same location
+    # The hostPath for output on L19, L53 and L68 should all point to the same location
+    # https://kind.sigs.k8s.io/docs/user/configuration/#extra-mounts
+    image: kindest/node:v1.29.1
+    extraMounts:
+      - hostPath: *dags_host
+        containerPath: *dags_cont
+      - hostPath: *logs_host
+        containerPath: *logs_cont
+      - hostPath: *output_host
+        containerPath: *output_cont

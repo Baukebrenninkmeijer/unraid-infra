@@ -1,0 +1,108 @@
+# This file provides the logic to create persistent volumes on the KinD cluster
+# defined in "kind-cluster.yaml". Run this file after creating your KinD cluster.
+# NOTE: if you decide to not use use KinD, you do not have to use this file.
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local
+provisioner: kubernetes.io/no-provisioner
+---
+# Persistent volume to store your DAGs. 
+# This maps to the /dags location specified in "kind-cluster.yaml"
+# You don not have to change this resource.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: airflow-pv-dags
+spec:
+  capacity:
+    storage: 50Mi
+  accessModes:
+    - ReadOnlyMany
+  storageClassName: local
+  volumeMode: Filesystem
+  hostPath:
+    path: /dags
+  persistentVolumeReclaimPolicy: Retain
+---
+# Persistent volume to store your DAGs. 
+# This maps to the /logs location specified in "kind-cluster.yaml"
+# You don not have to change this resource.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: airflow-pv-logs
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: local
+  volumeMode: Filesystem
+  hostPath:
+    path: /logs
+  persistentVolumeReclaimPolicy: Retain
+---
+# Persistent volume to store your output. 
+# This maps to the /output location specified in "kind-cluster.yaml"
+# You don not have to change this resource.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: airflow-pv-output
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: local
+  volumeMode: Filesystem
+  hostPath:
+    path: /output
+  persistentVolumeReclaimPolicy: Retain
+---
+
+
+# Persistent volume claims to use the persistent volumes
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: airflow-pvc-dags
+  namespace: airflow
+spec:
+  accessModes:
+    - ReadOnlyMany
+  storageClassName: local
+  resources:
+    requests:
+      storage: 10Mi
+  volumeName: airflow-pv-dags
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: airflow-pvc-logs
+  namespace: airflow
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: local
+  resources:
+    requests:
+      storage: 10Mi
+  volumeName: airflow-pv-logs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: airflow-pvc-output
+  namespace: airflow
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: local
+  resources:
+    requests:
+      storage: 99Mi
+  volumeName: airflow-pv-output

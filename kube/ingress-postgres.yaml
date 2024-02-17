@@ -1,0 +1,22 @@
+---
+# Doesn't currently work, but for debugging purposes, like desired connection.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: postgres-ingress
+  namespace: airflow
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: /postgres(/|$)(.*)
+        backend:
+          service:
+            name: postgresql-db
+            port:
+              number: 5433
+---
